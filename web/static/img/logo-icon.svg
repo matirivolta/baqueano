@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" width="100%" height="100%">
+  <defs>
+    <linearGradient id="goldGradIcon" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F3C68F"/>
+      <stop offset="50%" stop-color="#D49A3D"/>
+      <stop offset="100%" stop-color="#B87322"/>
+    </linearGradient>
+
+    <linearGradient id="pampaGreenIcon" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2D5A43"/>
+      <stop offset="100%" stop-color="#143224"/>
+    </linearGradient>
+
+    <filter id="subtleGlowIcon" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#000000" flood-opacity="0.15"/>
+    </filter>
+  </defs>
+
+  <!-- Fondo para App Icon / Avatar -->
+  <rect width="160" height="160" rx="36" fill="#143224"/>
+
+  <!-- Anillo exterior de orientación -->
+  <circle cx="80" cy="80" r="66" fill="none" stroke="#D49A3D" stroke-width="1.5" stroke-dasharray="4, 5" opacity="0.5"/>
+
+  <!-- Símbolo Central -->
+  <g transform="translate(10, 10)" filter="url(#subtleGlowIcon)">
+    <!-- Cuerno Izquierdo -->
+    <path d="M 70 72 C 60 55 42 42 28 46 C 24 47 23 51 26 53 C 38 60 52 70 62 88 Z" fill="#F8F9FA"/>
+    <!-- Cuerno Derecho -->
+    <path d="M 70 72 C 80 55 98 42 112 46 C 116 47 117 51 114 53 C 102 60 88 70 78 88 Z" fill="#F8F9FA"/>
+
+    <!-- Rostro Bovino Geométrico -->
+    <path d="M 48 68 L 92 68 L 84 98 L 70 114 L 56 98 Z" fill="#F8F9FA"/>
+    <path d="M 52 72 L 88 72 L 81 96 L 70 108 L 59 96 Z" fill="#E9ECEF"/>
+
+    <!-- Rosa de los vientos / Brújula Baqueana (Alzada en Oro) -->
+    <path d="M 70 20 L 76 54 L 70 48 Z" fill="url(#goldGradIcon)"/>
+    <path d="M 70 20 L 64 54 L 70 48 Z" fill="#B87322"/>
+    <path d="M 70 76 L 75 56 L 70 60 Z" fill="url(#goldGradIcon)"/>
+    <path d="M 70 76 L 65 56 L 70 60 Z" fill="#B87322"/>
+    <path d="M 98 54 L 76 49 L 80 54 Z" fill="url(#goldGradIcon)"/>
+    <path d="M 98 54 L 76 59 L 80 54 Z" fill="#B87322"/>
+    <path d="M 42 54 L 64 49 L 60 54 Z" fill="url(#goldGradIcon)"/>
+    <path d="M 42 54 L 64 59 L 60 54 Z" fill="#B87322"/>
+
+    <circle cx="70" cy="54" r="3.5" fill="#143224" stroke="#D49A3D" stroke-width="1.5"/>
+  </g>
+</svg>
