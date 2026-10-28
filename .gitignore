@@ -1,0 +1,28 @@
+# Binarios generados
+bin/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test y perfiles
+*.out
+*.test
+coverage.txt
+
+# Entornos y secretos
+.env
+.env.local
+
+# IDEs y SO
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Temporales
+tmp/
+scratch/
+.python_pkgs/
+

@@ -2,10 +2,13 @@ package quotation
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/matirivolta/baqueano/internal/domain"
 )
+
+var ErrRepoNoDisponible = errors.New("repositorio de datos no disponible")
 
 // DefaultService implementa los casos de uso de negocio del Bounded Context de Cotizaciones.
 type DefaultService struct {
@@ -28,11 +31,17 @@ func NewService(repo QuotationRepository, catRepo CategoriaRepository, calc Calc
 
 // ObtenerResumenMercado obtiene el tablero consolidado de últimas cotizaciones por categoría y mercado.
 func (s *DefaultService) ObtenerResumenMercado(ctx context.Context) ([]domain.Cotizacion, error) {
+	if s.repo == nil {
+		return nil, ErrRepoNoDisponible
+	}
 	return s.repo.GetUltimasCotizaciones(ctx)
 }
 
 // ObtenerSerieHistorica retorna la serie temporal de precios para análisis gráfico o de dispersión.
 func (s *DefaultService) ObtenerSerieHistorica(ctx context.Context, categoriaID int32, desde time.Time) ([]domain.Cotizacion, error) {
+	if s.repo == nil {
+		return nil, ErrRepoNoDisponible
+	}
 	return s.repo.GetSerieHistorica(ctx, categoriaID, desde)
 }
 

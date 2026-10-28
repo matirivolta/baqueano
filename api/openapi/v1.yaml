@@ -1,0 +1,348 @@
+openapi: 3.0.3
+info:
+  title: Baqueano API - Cotizador y Liquidación Ganadera
+  version: 1.0.0
+  description: >
+    API REST de alto rendimiento para el monitoreo en tiempo real de precios de hacienda en Argentina
+    (MAG Cañuelas, Rosgan, De Campo a Campo, Monasterio Tattersall) y motor de simulación de liquidaciones netas al bolsillo.
+servers:
+  - url: http://localhost:8080
+    description: Servidor local de desarrollo
+
+paths:
+  /api/v1/healthz:
+    get:
+      summary: Healthcheck probe
+      description: Verifica la disponibilidad del servicio y la conectividad a la base de datos PostgreSQL.
+      responses:
+        '200':
+          description: Servicio saludable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+        '503':
+          description: Servicio degradado o dependencias no disponibles
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+
+  /api/v1/categorias:
+    get:
+      summary: Catálogo canónico de categorías
+      description: Retorna el listado de categorías normalizadas de hacienda (Novillos, Terneros, Vacas, etc.).
+      responses:
+        '200':
+          description: Listado de categorías
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CategoriaCanon'
+
+  /api/v1/cotizaciones/resumen:
+    get:
+      summary: Tablero consolidado de últimas cotizaciones
+      description: Obtiene las cotizaciones vigentes por categoría y plaza, e incluye el ratio de reposición Ternero/Novillo.
+      responses:
+        '200':
+          description: Tablero de cotizaciones y relación de reposición
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResumenResponse'
+
+  /api/v1/cotizaciones/historico/{categoria_id}:
+    get:
+      summary: Serie temporal de cotizaciones
+      description: Retorna las cotizaciones históricas para una categoría canónica específica.
+      parameters:
+        - name: categoria_id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID único de la categoría canónica
+        - name: desde
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+          example: '2026-10-01'
+          description: Fecha de inicio de la serie (YYYY-MM-DD)
+      responses:
+        '200':
+          description: Serie histórica de precios
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Cotizacion'
+
+  /api/v1/calculadora/neto:
+    post:
+      summary: Simulación de liquidación ganadera neta
+      description: >
+        Calcula el rinde neto al pie del camión descontando desbaste, comisiones, IVA, fletes,
+        gastos fijos y costo financiero por plazo comercial diferido (TNA).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ParametrosLiquidacion'
+      responses:
+        '200':
+          description: Desglose financiero y resultado neto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LiquidacionNeta'
+        '400':
+          description: Parámetros inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/calculadora/comparar:
+    post:
+      summary: Comparación de múltiples ofertas comerciales
+      description: Simula y compara en paralelo múltiples ofertas de compra o condiciones de venta.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/ParametrosLiquidacion'
+      responses:
+        '200':
+          description: Listado comparativo de liquidaciones netas
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LiquidacionNeta'
+        '400':
+          description: Ofertas inválidas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: ok
+        timestamp:
+          type: string
+          format: date-time
+        services:
+          type: object
+          additionalProperties:
+            type: string
+
+    CategoriaCanon:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        codigo:
+          type: string
+          example: NOVILLO_ESP
+        nombre_visible:
+          type: string
+          example: Novillos Especiales (430-460 kg)
+        tipo_destino:
+          type: string
+          enum: [FAENA, INVERNADA, CRIA]
+          example: FAENA
+        peso_minimo_kg:
+          type: integer
+          nullable: true
+          example: 430
+        peso_maximo_kg:
+          type: integer
+          nullable: true
+          example: 460
+        activo:
+          type: boolean
+          example: true
+
+    Cotizacion:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 104
+        fecha:
+          type: string
+          format: date-time
+        fuente:
+          type: string
+          example: MAG
+        categoria_canon_id:
+          type: integer
+          example: 1
+        categoria_codigo:
+          type: string
+          example: NOVILLO_ESP
+        categoria_nombre:
+          type: string
+          example: Novillos Especiales
+        tipo_destino:
+          type: string
+          example: FAENA
+        precio_promedio:
+          type: string
+          example: '2150.50'
+        precio_min:
+          type: string
+          nullable: true
+          example: '2050.00'
+        precio_max:
+          type: string
+          nullable: true
+          example: '2280.00'
+        volumen_cabezas:
+          type: integer
+          example: 1420
+
+    RelacionReposicion:
+      type: object
+      properties:
+        precio_ternero:
+          type: string
+          example: '2600.00'
+        precio_novillo:
+          type: string
+          example: '2100.00'
+        ratio:
+          type: string
+          example: '1.238'
+        interpretacion:
+          type: string
+          example: 'Relación en equilibrio histórico promedio (1.15 - 1.25).'
+
+    ResumenResponse:
+      type: object
+      properties:
+        cotizaciones:
+          type: array
+          items:
+            $ref: '#/components/schemas/Cotizacion'
+        relacion_reposicion:
+          $ref: '#/components/schemas/RelacionReposicion'
+
+    ParametrosLiquidacion:
+      type: object
+      required:
+        - cabezas
+        - peso_bruto_kg
+        - precio_por_kg
+      properties:
+        cabezas:
+          type: integer
+          example: 60
+        peso_bruto_kg:
+          type: string
+          example: '390.00'
+        es_peso_individual:
+          type: boolean
+          example: true
+        precio_por_kg:
+          type: string
+          example: '2100.00'
+        porcentaje_desbaste:
+          type: string
+          example: '3.00'
+        porcentaje_comision:
+          type: string
+          example: '2.00'
+        porcentaje_iva_comision:
+          type: string
+          example: '21.00'
+        costo_flete_total:
+          type: string
+          example: '250000.00'
+        otros_costos_fijos:
+          type: string
+          example: '45000.00'
+        plazo_dias:
+          type: integer
+          example: 30
+        tasa_interes_anual:
+          type: string
+          example: '45.00'
+
+    LiquidacionNeta:
+      type: object
+      properties:
+        cabezas:
+          type: integer
+          example: 60
+        kilos_brutos:
+          type: string
+          example: '23400.00'
+        kilos_desbaste:
+          type: string
+          example: '702.00'
+        kilos_netos:
+          type: string
+          example: '22698.00'
+        precio_por_kg:
+          type: string
+          example: '2100.00'
+        importe_bruto:
+          type: string
+          example: '47665800.00'
+        monto_comision:
+          type: string
+          example: '953316.00'
+        monto_iva_comision:
+          type: string
+          example: '200196.36'
+        monto_flete:
+          type: string
+          example: '250000.00'
+        monto_otros_gastos:
+          type: string
+          example: '45000.00'
+        total_deducciones_comerciales:
+          type: string
+          example: '1448512.36'
+        subtotal_sin_descuento_financiero:
+          type: string
+          example: '46217287.64'
+        costo_financiero:
+          type: string
+          example: '1709405.00'
+        cobro_neto_efectivo:
+          type: string
+          example: '44507882.64'
+        precio_neto_por_kilo_neto:
+          type: string
+          example: '1960.87'
+        precio_neto_por_kilo_bruto:
+          type: string
+          example: '1902.05'
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          example: parámetros inválidos
+

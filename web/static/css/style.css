@@ -1,0 +1,89 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap');
+
+:root {
+  --color-pampa: #143224;
+  --color-pampa-light: #1D4331;
+  --color-gold: #D49A3D;
+  --color-gold-light: #E5AE59;
+  --color-cream: #FAF8F5;
+  --color-carbon: #131F18;
+  --color-border: #E5DFD5;
+  --color-muted: #64748B;
+}
+
+body {
+  font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background-color: var(--color-cream);
+  color: var(--color-carbon);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Números tabulares para máxima legibilidad en precios y tablas */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Colores de marca */
+.bg-pampa {
+  background-color: var(--color-pampa);
+}
+
+.bg-pampa-light {
+  background-color: var(--color-pampa-light);
+}
+
+.text-pampa {
+  color: var(--color-pampa);
+}
+
+.bg-gold {
+  background-color: var(--color-gold);
+}
+
+.text-gold {
+  color: var(--color-gold);
+}
+
+.border-gold {
+  border-color: var(--color-gold);
+}
+
+.bg-cream {
+  background-color: var(--color-cream);
+}
+
+.border-rural {
+  border-color: var(--color-border);
+}
+
+/* Custom Range Slider */
+input[type="range"] {
+  accent-color: var(--color-gold);
+}
+
+/* Transiciones suaves */
+.transition-card {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.transition-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px -4px rgba(20, 50, 36, 0.08);
+}
+
+/* Pulsing Online Dot */
+.online-pulse {
+  animation: pulse-green 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse-green {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.15);
+  }
+}
+

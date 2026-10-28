@@ -41,10 +41,19 @@ tidy:
 	@echo "==> Ejecutando go mod tidy..."
 	$(GO) mod tidy
 
-## build: Compila todos los paquetes del monorepo
+## build: Compila todos los paquetes del monorepo y genera los binarios
 build:
 	@echo "==> Compilando paquetes..."
 	$(GO) build ./...
+	@mkdir -p $(BINARY_DIR)
+	$(GO) build -o $(BINARY_DIR)/collector ./cmd/collector
+	$(GO) build -o $(BINARY_DIR)/dispatcher ./cmd/dispatcher
+	$(GO) build -o $(BINARY_DIR)/api-server ./cmd/api-server
+
+## docs-pdf: Genera el documento PDF de arquitectura y especificación técnica
+docs-pdf:
+	@echo "==> Generando documentación técnica en PDF..."
+	python3 docs/generate_pdf.py
 
 ## clean: Limpia artefactos generados y temporales
 clean:
