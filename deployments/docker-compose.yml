@@ -1,0 +1,53 @@
+version: '3.8'
+
+networks:
+  frontend_net:
+    driver: bridge
+  backend_net:
+    driver: bridge
+  data_net:
+    driver: bridge
+
+volumes:
+  pg_data:
+  redis_data:
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: cotizador_postgres
+    environment:
+      POSTGRES_DB: cotizador_db
+      POSTGRES_USER: ${DB_USER:-cotizador_app}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-cotizador_secret_pwd}
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+      - ../sql/migrations:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+    networks:
+      - data_net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-cotizador_app} -d cotizador_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: cotizador_redis
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - data_net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+

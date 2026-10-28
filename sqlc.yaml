@@ -1,0 +1,21 @@
+version: "2"
+sql:
+  - engine: "postgresql"
+    schema: "sql/migrations"
+    queries: "sql/queries"
+    gen:
+      go:
+        package: "db"
+        out: "internal/db"
+        sql_package: "pgx/v5"
+        emit_json_tags: true
+        emit_prepared_queries: true
+        emit_interface: true
+        emit_empty_slices: true
+        overrides:
+          - column: "cotizaciones.precio_promedio"
+            go_type: "github.com/shopspring/decimal.Decimal"
+          - column: "cotizaciones.precio_min"
+            go_type: "github.com/shopspring/decimal.NullDecimal"
+          - column: "cotizaciones.precio_max"
+            go_type: "github.com/shopspring/decimal.NullDecimal"
